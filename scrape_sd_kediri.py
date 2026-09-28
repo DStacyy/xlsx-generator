@@ -1,14 +1,3 @@
-"""
-Scraper Data SD Kabupaten Kediri & Kota Kediri
-Sumber: referensi.data.kemendikdasmen.go.id
-
-Cara pakai:
-    pip install requests beautifulsoup4 openpyxl
-    python scrape_sd_kediri.py
-
-Hasil: sd_kediri.xlsx (kolom: Nomor, Nama Sekolah, Alamat, Kecamatan)
-"""
-
 import time
 import requests
 from bs4 import BeautifulSoup
@@ -17,7 +6,7 @@ from openpyxl.styles import Font, Alignment
 
 BASE = "https://referensi.data.kemendikdasmen.go.id/pendidikan/dikdas"
 
-# Kode kecamatan (level 3) hasil penelusuran di situs, jf/5 = jenjang SD
+# jf/5 = jenjang SD
 KAB_KEDIRI = {
     "051301": "Kras", "051302": "Ringinrejo", "051303": "Ngancar",
     "051304": "Kepung", "051305": "Puncu", "051306": "Plosoklaten",
@@ -41,8 +30,8 @@ HEADERS = {
 }
 
 
+#ambil daftar SD untuk satu kecamatan (format: nama sekolah + alamat)
 def scrape_kecamatan(kode, nama_kecamatan):
-    """Ambil daftar SD untuk satu kecamatan (nama sekolah + alamat)."""
     url = f"{BASE}/{kode}/3/jf/5/all"
     resp = requests.get(url, headers=HEADERS, timeout=30)
     resp.raise_for_status()
@@ -82,7 +71,7 @@ def main():
 
     print(f"\nTotal sekolah terkumpul: {len(all_rows)}")
 
-    # Tulis ke Excel
+    
     wb = Workbook()
     ws = wb.active
     ws.title = "Data SD"
@@ -96,13 +85,13 @@ def main():
     for i, (nama_sekolah, alamat, kecamatan) in enumerate(all_rows, start=1):
         ws.append([i, nama_sekolah, alamat, kecamatan])
 
-    # Lebar kolom biar rapi
+    
     widths = [8, 45, 45, 20]
     for col_letter, w in zip("ABCD", widths):
         ws.column_dimensions[col_letter].width = w
 
     wb.save("sd_kediri.xlsx")
-    print("Selesai! File tersimpan sebagai sd_kediri.xlsx")
+    print("File tersimpan sebagai sd_kediri.xlsx")
 
 
 if __name__ == "__main__":
